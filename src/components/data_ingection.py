@@ -4,7 +4,8 @@ from src.exeption import CustomException
 from src.logger import logging
 import pandas as pd 
 from sklearn.model_selection import train_test_split
-
+from src.components.data_transformation import DataTransformation
+from src.components.data_transformation import DataTransformationconfig
 from dataclasses import dataclass
 @dataclass
 class Datainjectionconfig:
@@ -40,4 +41,6 @@ class Datainjection:
 if __name__=="__main__":
 
     obj=Datainjection()
-    obj.intiate_data_injection()
+    train_data,test_data=obj.intiate_data_injection()
+    data_transformations=DataTransformation()
+    data_transformations.initiate_data_transformation(train_data, test_data)
