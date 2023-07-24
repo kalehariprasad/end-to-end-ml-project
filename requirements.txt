@@ -6,6 +6,4 @@ scikit-learn
 matplotlib
 catboost
 xgboost
-dill 
-pickle
 -e .
