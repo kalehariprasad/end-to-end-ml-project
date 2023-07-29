@@ -3,44 +3,53 @@ import pickle
 import pandas as pd 
 import numpy  as np
 from sklearn.preprocessing import StandardScaler
-from src.pipeline.predict_pipeline import PredictPipeline,CustomData
+import warnings
+from src.logger import logging
+
+model=pickle.load(open('artifacts\model.pkl','rb' ))
+preprocessor=pickle.load(open('artifacts\preprocessor.pkl','rb' ))
 
 
+
+
+gender_list=['female','male']
+race_ethnicity_list=['group B', 'group C', 'group A', 'group D' ,'group E']
+parental_level_of_education_list=["bachelor's degree" , 'some college' "master's degree" ,"associate's degree",'high school' ,'some high school']
+lunch_list=['standard' ,'free/reduced']
+test_preparation_course_list=['none','completed']
 st.title('Student performance indicator')
 
-gender=st.selectbox('select your Gender',['female','male'])
-race_ethnicity=st.selectbox('select your race/ethnicity',['group B', 'group C', 'group A', 'group D' ,'group E'])
-parental_level_of_education=st.selectbox('student parental level of education',["bachelor's degree" ,
-                                        'some college' "master's degree" ,
-                                        "associate's degree",
-                                        'high school' ,
-                                        'some high school'])
-lunch=st.selectbox('select lunch type',['standard' ,'free/reduced'])
-test_preparation_course=st.selectbox('Does student gone test preparation course',['none','completed'])
-reading_score=st.slider(label='Student Reading score',min_value=0,max_value=100)
-writing_score=st.slider(label='Student Writing score' ,min_value=0,max_value=100)
+gender=st.selectbox('select your Gender',sorted(gender_list))
+race_ethnicity=st.selectbox('select your race/ethnicity',sorted(race_ethnicity_list))
+parental_level_of_education=st.selectbox('student parental level of education',sorted(parental_level_of_education_list))
+lunch=st.selectbox('select lunch type',sorted(lunch_list))
+test_preparation_course=st.selectbox('Does student gone test preparation course',sorted(test_preparation_course_list))
+reading_score=st.number_input(label='Student Reading score',min_value=0,max_value=100)
+writing_score=st.number_input(label='Student Writing score' ,min_value=0,max_value=100)
 
-data_instance = CustomData(
-    gender=gender,
-    race_ethnicity=race_ethnicity,
-    parental_level_of_education=parental_level_of_education,
-    lunch=lunch,
-    test_preparation_course=test_preparation_course,
-    reading_score=reading_score,
-    writing_score=writing_score
-)
+data={'gender':gender,
+      'race/ethnicity':race_ethnicity,
+      'parental level of education':parental_level_of_education,
+      'lunch':lunch,
+      'test preparation course':test_preparation_course,
+      'reading score':reading_score,
+      'writing score':writing_score
 
-st.write(data_instance)
-input_features = data_instance.get_data_as_dataframe().values
+      }
+input_data=pd.DataFrame(data=data,index=[0])
 
-st.write(input_features)
 
-predictor=PredictPipeline()
+
+
+st.write(input_data)
+
 if st.button('predict'):
-    try:
-        
-        predictions = predictor.Predict(features=input_features)
-        st.write("Predicted Scores:")
-        st.write(predictions)
-    except Exception as e:
-        st.error(f"Prediction error: {e}")
+    input_data=preprocessor.transform(input_data)
+    logging.info(f'prprocessed data is: {input_data}')
+    prediction=model.predict(input_data)
+    if prediction is not None:
+
+        st.write(f"expected math score will be : {np.round(prediction[0],decimals=2)}")
+
+
+

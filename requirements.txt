@@ -8,5 +8,4 @@ catboost
 xgboost
 dill
 streamlit
-pickle5
-#-e .
+-e .
