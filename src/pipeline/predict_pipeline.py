@@ -1,7 +1,9 @@
 import os
 import sys 
 import pandas as pd
+import streamlit as st
 from src.exeption import CustomException
+from src.logger import logging
 from src.utils import load_object
 
 class PredictPipeline:
@@ -15,7 +17,9 @@ class PredictPipeline:
             model=load_object(file_path=model_path)
             preprocessor=load_object(file_path=preprocrssor_path)
             data_scaled=preprocessor.transform(features)
+            logging.info(f"inut variables for prediction are :{data_scaled}")
             pred=model.predict(data_scaled)
+            return pred 
         
 
         except Exception as e:
@@ -23,47 +27,51 @@ class PredictPipeline:
 
 
 class CustomData:
-    def __init__(self,
-                 gender: str,
-                 race_ethnicity: str,
-                 parental_level_of_education: str,
-                 lunch: str,
-                 test_preparation_course: str,
-                 reading_score: int,
-                 writing_score: int
-                 ):
-        self.gender = gender
-        self.race_ethnicity = race_ethnicity
-        self.parental_level_of_education = parental_level_of_education
-        self.lunch = lunch
-        self.test_preparation_course = test_preparation_course
-        self.reading_score = reading_score
-        self.writing_score = writing_score
+    def __init__(self):
+        pass
 
-    def get_data_as_dataframe(self):
-        custom_data_input_dict = {
-            "gender": self.gender,
-            "race/ethnicity": self.race_ethnicity,
-            "parental level of education": self.parental_level_of_education,
-            "lunch": self.lunch,
-            "test preparation course": self.test_preparation_course,
-            "reading score": self.reading_score,
-            "writing score": self.writing_score
+
+    def get_dataframe(self):
+        gender_list=['female','male']
+        race_ethnicity_list=['group B', 'group C', 'group A', 'group D' ,'group E']
+        parental_level_of_education_list=["bachelor's degree" , 'some college' "master's degree" ,"associate's degree",'high school' ,'some high school']
+        lunch_list=['standard' ,'free/reduced']
+        test_preparation_course_list=['none','completed']
+
+
+        gender=st.selectbox('select your Gender',sorted(gender_list))
+        race_ethnicity=st.selectbox('select your race/ethnicity',sorted(race_ethnicity_list))
+        parental_level_of_education=st.selectbox('student parental level of education',sorted(parental_level_of_education_list))
+        lunch=st.selectbox('select lunch type',sorted(lunch_list))
+        test_preparation_course=st.selectbox('Does student gone test preparation course',sorted(test_preparation_course_list))
+        reading_score=st.number_input(label='Student Reading score',min_value=0,max_value=100)
+        writing_score=st.number_input(label='Student Writing score' ,min_value=0,max_value=100)
+
+
+        data={
+        'gender':gender,
+        'race/ethnicity':race_ethnicity,
+        'parental level of education':parental_level_of_education,
+        'lunch':lunch,
+        'test preparation course':test_preparation_course,
+        'reading score':reading_score,
+        'writing score':writing_score
+
         }
+        DataFrame=pd.DataFrame(data=data,index=[0])
+        return pd.DataFrame(DataFrame)
 
-        # Create a DataFrame from the input dictionary
-        df = pd.DataFrame([custom_data_input_dict])
+        
 
-        return df
 
-    def __str__(self):
-        return f"CustomData(gender='{self.gender}', " \
-               f"race/ethnicity='{self.race_ethnicity}', " \
-               f"parental level of education='{self.parental_level_of_education}', " \
-               f"lunch='{self.lunch}', " \
-               f"test preparation course='{self.test_preparation_course}', " \
-               f"reading score={self.reading_score}, " \
-               f"writing score={self.writing_score})"
+    
+     
+    
+
+
+
+    
+
 
 
 
