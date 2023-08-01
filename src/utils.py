@@ -57,9 +57,10 @@ def evaluate_models(x_train, y_train, x_test, y_test, models, param):
 
 def load_object(file_path):
     try:
-        with open(file_path ,"rb") as file_obj:
-            return dill.load(file_obj)
-    except Exception as e :
+        with open(file_path, "rb") as file_obj:
+            return pickle.load(file_obj)
+    except Exception as e:
+        print(f"Error occurred while loading the object from {file_path}: {e}")
         raise CustomException(e, sys)
 
         
